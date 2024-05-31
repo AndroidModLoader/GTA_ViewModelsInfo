@@ -115,6 +115,10 @@ void DrawString(std::string text, float posX, float posY, float sizeX, float siz
 #define PedPreRenderPatch(__i) \
     DECL_HOOKv(PedPreRender##__i, CPed* self) { PedPreRender##__i(self); if((nModStatus == MODSTAT_SHOWBOTH || nModStatus == MODSTAT_SHOWENTS) && bShowPeds) entityList.push_back(self); }
 
+#define PlayerPedPreRenderPatch(__i) \
+    DECL_HOOKv(PlayerPedPreRender##__i, CPlayerPed* self) { PlayerPedPreRender##__i(self); if((nModStatus == MODSTAT_SHOWBOTH || nModStatus == MODSTAT_SHOWENTS) && bShowPeds) \
+                                                            if(self->m_nModelIndex != 0 || FindPlayerPed(-1) == self) entityList.push_back(self); }
+
 #define VehiclePreRenderPatch(__i) \
     DECL_HOOKv(VehiclePreRender##__i, CVehicle* self) { VehiclePreRender##__i(self); if((nModStatus == MODSTAT_SHOWBOTH || nModStatus == MODSTAT_SHOWENTS) && bShowVehicles) entityList.push_back(self); }
 
@@ -130,7 +134,8 @@ PedPreRenderPatch(1);
 PedPreRenderPatch(2);
 PedPreRenderPatch(3);
 PedPreRenderPatch(4);
-PedPreRenderPatch(5);
+
+PlayerPedPreRenderPatch(1);
 
 VehiclePreRenderPatch(1);
 VehiclePreRenderPatch(2);
@@ -260,53 +265,53 @@ extern "C" void OnModLoad()
     sautils->AddClickableItem(eTypeOfSettings::SetType_Mods, "ViewModelsInfo: Show Vehicles ID", bShowVehicles, 0, 1, pYesNo, OnSettingSwitch_Vehicles, NULL);
 
     // Hooks
-    HOOKPLT(EntityPreRender1, pGTASA + BYBIT(0x662010, 0x824F40));
-    HOOKPLT(EntityPreRender2, pGTASA + BYBIT(0x667C2C, 0x82FEA8));
-    HOOKPLT(EntityPreRender3, pGTASA + BYBIT(0x667C90, 0x82FF70));
-    HOOKPLT(EntityPreRender4, pGTASA + BYBIT(0x667D04, 0x830058));
-    HOOKPLT(EntityPreRender5, pGTASA + BYBIT(0x667E24, 0x8302A8));
-    HOOKPLT(EntityPreRender6, pGTASA + BYBIT(0x668BD4, 0x831E08));
-    HOOKPLT(EntityPreRender7, pGTASA + BYBIT(0x671618, 0x842730));
-    HOOKPLT(PedPreRender1,    pGTASA + BYBIT(0x668AEC, 0x831C38));
-    HOOKPLT(PedPreRender2,    pGTASA + BYBIT(0x668B60, 0x831D20));
-    HOOKPLT(PedPreRender3,    pGTASA + BYBIT(0x668C38, 0x831ED0));
-    HOOKPLT(PedPreRender4,    pGTASA + BYBIT(0x668CB0, 0x831FC0));
-    HOOKPLT(PedPreRender5,    pGTASA + BYBIT(0x6692D0, 0x833188));
-    HOOKPLT(VehiclePreRender1,pGTASA + BYBIT(0x66E268, 0x83D310));
-    HOOKPLT(VehiclePreRender2,pGTASA + BYBIT(0x66F490, 0x83F1A8));
+    HOOKPLT(EntityPreRender1,    pGTASA + BYBIT(0x662010, 0x824F40));
+    HOOKPLT(EntityPreRender2,    pGTASA + BYBIT(0x667C2C, 0x82FEA8));
+    HOOKPLT(EntityPreRender3,    pGTASA + BYBIT(0x667C90, 0x82FF70));
+    HOOKPLT(EntityPreRender4,    pGTASA + BYBIT(0x667D04, 0x830058));
+    HOOKPLT(EntityPreRender5,    pGTASA + BYBIT(0x667E24, 0x8302A8));
+    HOOKPLT(EntityPreRender6,    pGTASA + BYBIT(0x668BD4, 0x831E08));
+    HOOKPLT(EntityPreRender7,    pGTASA + BYBIT(0x671618, 0x842730));
+    HOOKPLT(PedPreRender1,       pGTASA + BYBIT(0x668AEC, 0x831C38));
+    HOOKPLT(PedPreRender2,       pGTASA + BYBIT(0x668B60, 0x831D20));
+    HOOKPLT(PedPreRender3,       pGTASA + BYBIT(0x668C38, 0x831ED0));
+    HOOKPLT(PedPreRender4,       pGTASA + BYBIT(0x668CB0, 0x831FC0));
+    HOOKPLT(PlayerPedPreRender1, pGTASA + BYBIT(0x6692D0, 0x833188));
+    HOOKPLT(VehiclePreRender1,   pGTASA + BYBIT(0x66E268, 0x83D310));
+    HOOKPLT(VehiclePreRender2,   pGTASA + BYBIT(0x66F490, 0x83F1A8));
   #ifdef AML32
-    HOOKBLX(DrawingEvent,     pGTASA + 0x3F6464 + 0x1);
-    HOOKBLX(GameIdleEvent,    pGTASA + 0x3F4122 + 0x1);
+    HOOKBLX(DrawingEvent,        pGTASA + 0x3F6464 + 0x1);
+    HOOKBLX(GameIdleEvent,       pGTASA + 0x3F4122 + 0x1);
   #else
-    HOOKBL(DrawingEvent,      pGTASA + 0x4D89FC);
-    HOOKBL(GameIdleEvent,     pGTASA + 0x4D6494);
+    HOOKBL(DrawingEvent,         pGTASA + 0x4D89FC);
+    HOOKBL(GameIdleEvent,        pGTASA + 0x4D6494);
   #endif
 
     // Game Funcs
-    SET_TO(CalcScreenCoors,                 aml->GetSym(hGTASA, "_ZN7CSprite15CalcScreenCoorsERK5RwV3dPS0_PfS4_bb"));
-    SET_TO(Font_SetScale,                   aml->GetSym(hGTASA, "_ZN5CFont8SetScaleEf"));
-    SET_TO(Font_SetFontStyle,               aml->GetSym(hGTASA, "_ZN5CFont12SetFontStyleEh"));
-    SET_TO(Font_SetProportional,            aml->GetSym(hGTASA, "_ZN5CFont15SetProportionalEh"));
-    SET_TO(Font_SetJustify,                 aml->GetSym(hGTASA, "_ZN5CFont10SetJustifyEh"));
-    SET_TO(Font_SetOrientation,             aml->GetSym(hGTASA, "_ZN5CFont14SetOrientationEh"));
-    SET_TO(Font_SetEdge,                    aml->GetSym(hGTASA, "_ZN5CFont7SetEdgeEa"));
-    SET_TO(Font_SetDropColor,               aml->GetSym(hGTASA, "_ZN5CFont12SetDropColorE5CRGBA"));
-    SET_TO(Font_SetBackground,              aml->GetSym(hGTASA, "_ZN5CFont13SetBackgroundEhh"));
-    SET_TO(Font_SetColor,                   aml->GetSym(hGTASA, "_ZN5CFont8SetColorE5CRGBA"));
-    SET_TO(Font_SetCentreSize,              aml->GetSym(hGTASA, "_ZN5CFont13SetCentreSizeEf"));
-    SET_TO(Font_PrintString,                aml->GetSym(hGTASA, "_ZN5CFont11PrintStringEffPt"));
-    SET_TO(AsciiToGxtChar,                  aml->GetSym(hGTASA, "_Z14AsciiToGxtCharPKcPt"));
-    SET_TO(FindPlayerPed,                   aml->GetSym(hGTASA, "_Z13FindPlayerPedi"));
-    SET_TO(GetTaskUseGun,                   aml->GetSym(hGTASA, "_ZNK16CPedIntelligence13GetTaskUseGunEv"));
-    SET_TO(Find3rdPersonCamTargetVector,    aml->GetSym(hGTASA, "_ZN7CCamera28Find3rdPersonCamTargetVectorEf7CVectorRS0_S1_"));
-    SET_TO(ProcessLineOfSight,              aml->GetSym(hGTASA, "_ZN6CWorld18ProcessLineOfSightERK7CVectorS2_R9CColPointRP7CEntitybbbbbbbb"));
-    SET_TO(RegisterCorona,                  aml->GetSym(hGTASA, BYBIT("_ZN8CCoronas14RegisterCoronaEjP7CEntityhhhhRK7CVectorffhhhhhfbfbfbb", "_ZN8CCoronas14RegisterCoronaEyP7CEntityhhhhRK7CVectorffhhhhhfbfbfbb")));
+    SET_TO(CalcScreenCoors,              aml->GetSym(hGTASA, "_ZN7CSprite15CalcScreenCoorsERK5RwV3dPS0_PfS4_bb"));
+    SET_TO(Font_SetScale,                aml->GetSym(hGTASA, "_ZN5CFont8SetScaleEf"));
+    SET_TO(Font_SetFontStyle,            aml->GetSym(hGTASA, "_ZN5CFont12SetFontStyleEh"));
+    SET_TO(Font_SetProportional,         aml->GetSym(hGTASA, "_ZN5CFont15SetProportionalEh"));
+    SET_TO(Font_SetJustify,              aml->GetSym(hGTASA, "_ZN5CFont10SetJustifyEh"));
+    SET_TO(Font_SetOrientation,          aml->GetSym(hGTASA, "_ZN5CFont14SetOrientationEh"));
+    SET_TO(Font_SetEdge,                 aml->GetSym(hGTASA, "_ZN5CFont7SetEdgeEa"));
+    SET_TO(Font_SetDropColor,            aml->GetSym(hGTASA, "_ZN5CFont12SetDropColorE5CRGBA"));
+    SET_TO(Font_SetBackground,           aml->GetSym(hGTASA, "_ZN5CFont13SetBackgroundEhh"));
+    SET_TO(Font_SetColor,                aml->GetSym(hGTASA, "_ZN5CFont8SetColorE5CRGBA"));
+    SET_TO(Font_SetCentreSize,           aml->GetSym(hGTASA, "_ZN5CFont13SetCentreSizeEf"));
+    SET_TO(Font_PrintString,             aml->GetSym(hGTASA, "_ZN5CFont11PrintStringEffPt"));
+    SET_TO(AsciiToGxtChar,               aml->GetSym(hGTASA, "_Z14AsciiToGxtCharPKcPt"));
+    SET_TO(FindPlayerPed,                aml->GetSym(hGTASA, "_Z13FindPlayerPedi"));
+    SET_TO(GetTaskUseGun,                aml->GetSym(hGTASA, "_ZNK16CPedIntelligence13GetTaskUseGunEv"));
+    SET_TO(Find3rdPersonCamTargetVector, aml->GetSym(hGTASA, "_ZN7CCamera28Find3rdPersonCamTargetVectorEf7CVectorRS0_S1_"));
+    SET_TO(ProcessLineOfSight,           aml->GetSym(hGTASA, "_ZN6CWorld18ProcessLineOfSightERK7CVectorS2_R9CColPointRP7CEntitybbbbbbbb"));
+    SET_TO(RegisterCorona,               aml->GetSym(hGTASA, BYBIT("_ZN8CCoronas14RegisterCoronaEjP7CEntityhhhhRK7CVectorffhhhhhfbfbfbb", "_ZN8CCoronas14RegisterCoronaEyP7CEntityhhhhRK7CVectorffhhhhhfbfbfbb")));
 
     // Game Vars
-    SET_TO(RsGlobal,                        aml->GetSym(hGTASA, "RsGlobal"));
-    SET_TO(TheCamera,                       aml->GetSym(hGTASA, "TheCamera"));
-    SET_TO(pIgnoreEntity,                   aml->GetSym(hGTASA, "_ZN6CWorld13pIgnoreEntityE"));
-    SET_TO(ms_modelInfoPtrs,                *(uintptr_t*)(pGTASA + BYBIT(0x6796D4, 0x850DB8)));
+    SET_TO(RsGlobal,                     aml->GetSym(hGTASA, "RsGlobal"));
+    SET_TO(TheCamera,                    aml->GetSym(hGTASA, "TheCamera"));
+    SET_TO(pIgnoreEntity,                aml->GetSym(hGTASA, "_ZN6CWorld13pIgnoreEntityE"));
+    SET_TO(ms_modelInfoPtrs,             *(uintptr_t*)(pGTASA + BYBIT(0x6796D4, 0x850DB8)));
 
     // Final!
     logger->Info("The mod has been loaded");
