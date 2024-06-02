@@ -189,7 +189,7 @@ DECL_HOOKv(GameIdleEvent)
             
             if(ProcessLineOfSight(&outCamPos, &outPointPos, &outColPoint, &outEntity, true, true, true, true, false, false, false, false))
             {
-                RegisterCorona(outEntity->m_nModelIndex + 6969, NULL, 255, 100, 50, 255, &outColPoint.m_vecPoint, 1.0f, 500.0f, eCoronaType::CORONATYPE_SHINYSTAR, eCoronaFlareType::FLARETYPE_NONE, false, false, 0, 0.0f, false, 0.1f, 0, 50.0f, false, false);
+                RegisterCorona(outEntity->m_nModelIndex + 6969, NULL, 255, 100, 50, 255, &outColPoint.m_vecPoint, 1.0f, 500.0f, eCoronaType::CORONATYPE_SHINYSTAR, eCoronaFlareType::FLARETYPE_NONE, false, false, 0, 0.0f, false, 1.5f, 0, 50.0f, false, false);
 
                 float sizeX, sizeY;
                 CVector screenPos2D;
