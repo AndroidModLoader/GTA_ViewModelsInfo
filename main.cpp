@@ -202,7 +202,7 @@ DECL_HOOKv(GameIdleEvent)
 
                     std::string text = std::to_string(outEntity->m_nModelIndex);
                     CBaseModelInfo* mi = ms_modelInfoPtrs[outEntity->m_nModelIndex];
-                    if(mi && mi->m_szModelName[0] != 0)
+                    if(mi && (uintptr_t)mi != (uintptr_t)-1 && mi->m_szModelName[0] != 0)
                     {
                         text += " (";
                         text += mi->m_szModelName;
