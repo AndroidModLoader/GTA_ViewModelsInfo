@@ -196,6 +196,9 @@ DECL_HOOKv(GameIdleEvent)
                 CVector screenPos2D;
                 if (CalcScreenCoors(&outColPoint.m_vecPoint, &screenPos2D, &sizeX, &sizeY, true, true))
                 {
+                    // FLA ass
+                    SET_TO(ms_modelInfoPtrs, *(uintptr_t*)(pGTASA + BYBIT(0x6796D4, 0x850DB8)));
+                    
                     float x = (screenPos2D.x / (float)RsGlobal->maximumWidth) * 640.0f;
                     float y = (screenPos2D.y / (float)RsGlobal->maximumHeight) * 448.0f;
                     sizeX = (sizeX / (float)RsGlobal->maximumWidth) * 15.0f;
@@ -315,7 +318,7 @@ extern "C" void OnAllModsLoaded()
     SET_TO(RsGlobal,                     aml->GetSym(hGTASA, "RsGlobal"));
     SET_TO(TheCamera,                    aml->GetSym(hGTASA, "TheCamera"));
     SET_TO(pIgnoreEntity,                aml->GetSym(hGTASA, "_ZN6CWorld13pIgnoreEntityE"));
-    SET_TO(ms_modelInfoPtrs,             *(uintptr_t*)(pGTASA + BYBIT(0x6796D4, 0x850DB8)));
+    //SET_TO(ms_modelInfoPtrs,             *(uintptr_t*)(pGTASA + BYBIT(0x6796D4, 0x850DB8)));
 
     // Final!
     logger->Info("The mod has been loaded");
