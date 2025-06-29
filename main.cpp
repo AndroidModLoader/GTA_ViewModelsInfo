@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------
 
 
-MYMOD(net.juniordjjr.rusjj.vmi, ViewModelsInfo, 1.0, JuniorDjjr & RusJJ)
+MYMOD(net.juniordjjr.rusjj.vmi, ViewModelsInfo, 1.1, JuniorDjjr & RusJJ)
 NEEDGAME(com.rockstargames.gtasa)
 BEGIN_DEPLIST()
     ADD_DEPENDENCY_VER(net.rusjj.aml, 1.2.1)
@@ -24,6 +24,7 @@ END_DEPLIST()
 uintptr_t pGTASA;
 void* hGTASA;
 ISAUtils* sautils;
+const intptr_t g_nCoronaIdent = 13371334;
 
 
 // ---------------------------------------------------------------------------------------
@@ -182,14 +183,14 @@ DECL_HOOKv(GameIdleEvent)
             Find3rdPersonCamTargetVector(TheCamera, 200.0f, startPos, &outCamPos, &outPointPos);
 
             CColPoint outColPoint;
-            CEntity* outEntity;
+            CEntity* outEntity = NULL;
 
             CEntity* backupIgnoreEnt = *pIgnoreEntity;
             *pIgnoreEntity = player;
             
-            if(ProcessLineOfSight(&outCamPos, &outPointPos, &outColPoint, &outEntity, true, true, true, true, false, false, false, false))
+            if(ProcessLineOfSight(&outCamPos, &outPointPos, &outColPoint, &outEntity, true, true, true, true, false, false, false, false) && outEntity)
             {
-                RegisterCorona(outEntity->m_nModelIndex + 6969, NULL, 255, 100, 50, 255, &outColPoint.m_vecPoint, 1.0f, 500.0f, eCoronaType::CORONATYPE_SHINYSTAR, eCoronaFlareType::FLARETYPE_NONE, false, false, 0, 0.0f, false, 1.5f, 0, 50.0f, false, false);
+                RegisterCorona(g_nCoronaIdent, NULL, 255, 100, 50, 255, &outColPoint.m_vecPoint, 1.0f, 500.0f, eCoronaType::CORONATYPE_SHINYSTAR, eCoronaFlareType::FLARETYPE_NONE, false, false, 0, 0.0f, false, 1.5f, 0, 50.0f, false, false);
 
                 float sizeX, sizeY;
                 CVector screenPos2D;
@@ -263,7 +264,10 @@ extern "C" void OnModLoad()
     sautils->AddClickableItem(eTypeOfSettings::SetType_Mods, "ViewModelsInfo: Show Peds ID", bShowPeds, 0, 1, pYesNo, OnSettingSwitch_Peds, NULL);
     bShowVehicles = false; // default
     sautils->AddClickableItem(eTypeOfSettings::SetType_Mods, "ViewModelsInfo: Show Vehicles ID", bShowVehicles, 0, 1, pYesNo, OnSettingSwitch_Vehicles, NULL);
+}
 
+extern "C" void OnAllModsLoaded()
+{
     // Hooks
     HOOKPLT(EntityPreRender1,    pGTASA + BYBIT(0x662010, 0x824F40));
     HOOKPLT(EntityPreRender2,    pGTASA + BYBIT(0x667C2C, 0x82FEA8));
